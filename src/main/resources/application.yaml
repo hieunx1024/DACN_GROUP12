@@ -1,0 +1,37 @@
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+  flyway:
+    locations: classpath:/db/migration
+    baseline-on-migrate: true
+server:
+  port: 8081
+service-discovery:
+  sendgrip:
+    base-url: https://api.sendgrid.com/v3/
+    api-key: 2m4aqq1pzBUEiIGYSibdajN1ILPqnsmnwUN4OhFMX7um0x+43xz9G2z1t6xGH/rSxZnnWyhf4o9rI9CeyTlGfCrcWwRPtYy0+HRa/ObcqSGVxcgLpH2bHV+EAZfuUrWxy66rbb7884pINGqVJ8i+180=
+    from-address: cskh-noreply-support@yopmail.com
+    secret-key: websales
+    template-id:
+      create-account: d-b9a89b30e37f4b8baaa79b46590ec30d
+      forgot-password: d-895853dafd1447c2a98c506c4b4a4b12
+      reset-password: d-a42a781dfdfa4b638825cc830421e4e9
+      online-payment: d-074320a7b85545e7b08012a40d6bb215
+      confirm-order: d-7ddcce933d174a259ee848f521af818e
+
+
+
+integration:
+  vnpay:
+    host: https://sandbox.vnpayment.vn/
+    secretKey: JWCRDNIWFHZMEWCENWULRYCGZHXLIZFP #GSNJWCTLEKNTPXSAUBWMMGKXBCGUDLSZ
+    generateURI: paymentv2/vpcpay.html
+    merchantCode: NIE1ALRZ #6UOCS96N
+    redirectProxy: http://localhost:${server.port}}/
+  client:
+    app:
+      host: ${CLIENT_HOST:}
+      context-patch-redirect: ${CLIENT_CONTEXT_PATCH_REDIRECT:http://localhost:${server.port}}/}
+
