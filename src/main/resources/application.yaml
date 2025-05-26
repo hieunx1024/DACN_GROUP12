@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   mvc:
     view:
@@ -6,8 +9,7 @@ spring:
   flyway:
     locations: classpath:/db/migration
     baseline-on-migrate: true
-server:
-  port: 8081
+
 service-discovery:
   sendgrip:
     base-url: https://api.sendgrid.com/v3/
@@ -21,17 +23,17 @@ service-discovery:
       online-payment: d-074320a7b85545e7b08012a40d6bb215
       confirm-order: d-7ddcce933d174a259ee848f521af818e
 
-
-
 integration:
   vnpay:
     host: https://sandbox.vnpayment.vn/
-    secretKey: JWCRDNIWFHZMEWCENWULRYCGZHXLIZFP #GSNJWCTLEKNTPXSAUBWMMGKXBCGUDLSZ
+    secretKey: L55NSF944W7OAHX3D8OFO0746SX35MPE
     generateURI: paymentv2/vpcpay.html
-    merchantCode: NIE1ALRZ #6UOCS96N
-    redirectProxy: http://localhost:${server.port}}/
+    merchantCode: GQ4LG2EC
+    redirectProxy: http://localhost:${server.port}/
+    return-url: http://localhost:8080/vnpay_jsp/vnpay_return.jsp
+    api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+
   client:
     app:
       host: ${CLIENT_HOST:}
-      context-patch-redirect: ${CLIENT_CONTEXT_PATCH_REDIRECT:http://localhost:${server.port}}/}
-
+      context-patch-redirect: ${CLIENT_CONTEXT_PATCH_REDIRECT:http://localhost:${server.port}}/

@@ -1,4 +1,4 @@
-use websales
+use 
 go
 
 create table Categories

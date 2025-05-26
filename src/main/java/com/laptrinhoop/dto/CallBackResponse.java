@@ -1,32 +1,38 @@
 package com.laptrinhoop.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 
-@Data
-@Builder
-@AllArgsConstructor
 public class CallBackResponse {
 
-    public enum CallBackResponseCode {
-        SUCCESS(0),
-        INVALID_TRANSACTION(1),
-        REQUEST_PROCESSED(2),
-        INVALID_AMOUNT(3),
-        ERROR_SYSTEM(4),
-        CANCEL_TRANSACTION(5);
-        int code;
-
-        CallBackResponseCode(int code) {
-            this.code = code;
-        }
-
+    // Enum to represent different response statuses
+    public enum Result {
+        SUCCESS,
+        INVALID_AMOUNT,
+        INVALID_TRANSACTION,
+        ERROR_SYSTEM,
+        REQUEST_PROCESSED,
+        CANCEL_TRANSACTION
     }
 
-    private CallBackResponseCode result;
+    // Field to store the result of the callback response
+    private Result result;
 
-    public static CallBackResponse create(CallBackResponseCode result) {
-        return new CallBackResponse(result);
+    // Getter for result
+    public Result getResult() {
+        return result;
+    }
+
+    // Setter for result
+    public void setResult(Result result) {
+        this.result = result;
+    }
+
+    // Other fields and methods related to the callback response
+
+    // Factory method to create a new CallBackResponse based on a result
+    public static CallBackResponse create(Result result) {
+        CallBackResponse response = new CallBackResponse();
+        response.setResult(result);
+        return response;
     }
 }

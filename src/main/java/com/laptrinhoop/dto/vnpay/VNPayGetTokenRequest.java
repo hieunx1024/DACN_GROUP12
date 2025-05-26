@@ -11,6 +11,7 @@ import com.laptrinhoop.utils.DateTimeUtil;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 @SuperBuilder(builderMethodName = "getTokenRequestBuilder")
 public class VNPayGetTokenRequest {
@@ -50,7 +51,6 @@ public class VNPayGetTokenRequest {
     @NotNull
     String orderType;
 
-
     @JsonProperty("vnp_ReturnUrl")
     @NotNull
     String returnUrl;
@@ -63,11 +63,9 @@ public class VNPayGetTokenRequest {
     @NotNull
     String txnRef;
 
-
     @JsonProperty("vnp_Version")
     @NotNull
     String version;
-
 
     public static VNPayGetTokenRequest from(Partner partner, PaymentRequest paymentRequest) {
         return VNPayGetTokenRequest
@@ -77,15 +75,17 @@ public class VNPayGetTokenRequest {
                 .tmdCode(partner.getMerchantId())
                 .orderInfo(paymentRequest.getDescription())
                 .orderType("topup")
-                .expireDate(DateTimeUtil.expireTimeInMinutes(15,VNPayConstants.FORMAT_DATE))
-                .ipAddress("127.0.0.1")
+                .expireDate(DateTimeUtil.expireTimeInMinutes(15, VNPayConstants.FORMAT_DATE)) // Expiration time set to
+                                                                                              // 15 minutes
+                .ipAddress(Optional.ofNullable(paymentRequest.getIpAddress()).orElse("127.0.0.1")) // Get IP from
+                                                                                                   // paymentRequest if
+                                                                                                   // available
                 .createDate(DateTimeUtil.nowToString(VNPayConstants.FORMAT_DATE))
                 .txnRef(paymentRequest.getInvoiceId())
-                .amount(String.valueOf(paymentRequest.getAmount().longValue() * 100))
+                .amount(String.valueOf(paymentRequest.getAmount().longValue() * 100)) // Amount in cents
                 .currCode(paymentRequest.getCurrencyCode().toUpperCase())
-                .locale(paymentRequest.getLocale() != null ? paymentRequest.getLocale() : "vi")
+                .locale(Optional.ofNullable(paymentRequest.getLocale()).orElse("vi")) // Default locale to "vi"
                 .returnUrl(paymentRequest.getRedirectUrl())
                 .build();
     }
-
 }

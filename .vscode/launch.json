@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-WebSalesApplication<spring-boot-websales>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.laptrinhoop.WebSalesApplication",
+            "projectName": "spring-boot-websales",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

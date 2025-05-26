@@ -1,7 +1,7 @@
 package com.laptrinhoop.controller.web;
 
 import java.util.List;
-
+import com.laptrinhoop.service.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +22,8 @@ import com.laptrinhoop.service.IProductService;
 @Controller
 public class ProductController {
 
+	private final ProductService productService;
+
 	@Autowired
 	private ICategoryService service;
 	@Autowired
@@ -38,28 +40,34 @@ public class ProductController {
 
 	@Autowired
 	private IHttpService httpService;
-	
-//	@Autowired
-//	private IElasticSearch elastic;
+
+	ProductController(ProductService productService) {
+		this.productService = productService;
+	}
+
+	// @Autowired
+	// private IElasticSearch elastic;
 
 	@RequestMapping("/product/list-by-category/{cId}")
 	public String listByCategory(@PathVariable("cId") Integer id, Model model) {
 		Category category = service.findById(id);
 		List<Product> listProduct = category.getProducts();
-		model.addAttribute("list",listProduct);
+		model.addAttribute("list", listProduct);
 		return "product/list";
 	}
 
 	@RequestMapping("/product/list-by-keywords")
 	public String listByKeyWords(@RequestParam("keywords") String keywords, Model model) {
-	//	model.addAttribute("list", elastic.searchElastiProduct(keywords));
+		List<Product> results = productService.findByKeywords(keywords);
+		model.addAttribute("list", results);
+		model.addAttribute("keywords", keywords); // để hiển thị lại từ khóa tìm kiếm nếu cần
 		return "product/list";
 	}
 
 	@RequestMapping("/product/detail/{id}")
-	public String detail(@PathVariable("id") Integer id, Model model) {    
+	public String detail(@PathVariable("id") Integer id, Model model) {
 		Product p = serviceProduct.findById(id);
-		p.setViewCount(p.getViewCount() + 1); 
+		p.setViewCount(p.getViewCount() + 1);
 		dao.update(p);
 		model.addAttribute("prod", p);
 		List<Product> listDaXem = serviceProduct.getViewProduct("daXem", id.toString());
@@ -84,8 +92,7 @@ public class ProductController {
 	}
 
 	@RequestMapping("/product/list-by-hot/{key}")
-	public String listByHot(@PathVariable("key") String key, Model model) 
-	{
+	public String listByHot(@PathVariable("key") String key, Model model) {
 		List<Product> listP = serviceProduct.findByHot(key);
 		model.addAttribute("list", listP);
 		return "product/list";

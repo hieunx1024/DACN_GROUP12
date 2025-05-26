@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VNPayProperties {
+
     @Value("${integration.vnpay.host}")
     private String host;
 

@@ -33,8 +33,6 @@ public class VNPayCallBackRequest {
     @JsonProperty("vnp_OrderInfo")
     private String transactionInfo;
 
-
-
     public CallBackRequest to() {
         VNPayCallBackResponseCode vnPayResponse = VNPayCallBackResponseCode.from(responseCode);
         return CallBackRequest
@@ -52,6 +50,4 @@ public class VNPayCallBackRequest {
                 .partnerTransactionTime(DateTimeUtil.stringToLocalDateTime(transactionDate, VNPayConstants.FORMAT_DATE))
                 .build();
     }
-
-
 }

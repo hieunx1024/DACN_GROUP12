@@ -7,15 +7,16 @@ import com.laptrinhoop.dto.CallBackResponse;
 import com.laptrinhoop.utils.DateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @AllArgsConstructor
 @Data
 public class VNPayCallBackResponse {
+
     @JsonProperty("RspCode")
     private String response;
+
     @JsonProperty("Message")
     private String message;
 
@@ -33,49 +34,74 @@ public class VNPayCallBackResponse {
 
     private String transactionDate;
 
-    private VNPayCallBackResponse(String code, String mes){
+    private VNPayCallBackResponse(String code, String mes) {
         this.response = code;
         this.message = mes;
     }
 
-    public static VNPayCallBackResponse from(CallBackResponse callBackResponse,VNPayCallBackRequest item) {
-        VNPayCallBackResponseCode vnPayCallBackResponseCode = null;
-        switch (callBackResponse.getResult()) {
-            case SUCCESS:
-                vnPayCallBackResponseCode = VNPayCallBackResponseCode.SUCCESS;
-                break;
-            case INVALID_AMOUNT:
-                vnPayCallBackResponseCode = VNPayCallBackResponseCode.INVALID_AMOUNT;
-                break;
-            case INVALID_TRANSACTION:
-                vnPayCallBackResponseCode = VNPayCallBackResponseCode.INVALID_TRANSACTION;
-                break;
-            case ERROR_SYSTEM:
-                vnPayCallBackResponseCode = VNPayCallBackResponseCode.ERROR_SYSTEM;
-                break;
-            case REQUEST_PROCESSED:
-                vnPayCallBackResponseCode = VNPayCallBackResponseCode.REQUEST_PROCESSED;
-                break;
-            case CANCEL_TRANSACTION:
-                vnPayCallBackResponseCode = VNPayCallBackResponseCode.CANCEL_TRANSACTION;
-                break;
-            default:
-                vnPayCallBackResponseCode = VNPayCallBackResponseCode.ERROR_SYSTEM;
-        }
-        return VNPayCallBackResponse.from(vnPayCallBackResponseCode,item);
+    /**
+     * Tạo đối tượng VNPayCallBackResponse từ CallBackResponse và
+     * VNPayCallBackRequest.
+     */
+    public static VNPayCallBackResponse from(CallBackResponse callBackResponse, VNPayCallBackRequest item) {
+        // Ánh xạ kết quả từ CallBackResponse sang VNPayCallBackResponseCode
+        VNPayCallBackResponseCode responseCode = mapToResponseCode(callBackResponse);
+
+        return from(responseCode, item);
     }
 
-    public static VNPayCallBackResponse from(VNPayCallBackResponseCode vnPayCallBackResponseCode,VNPayCallBackRequest item) {
-        VNPayCallBackResponse response =   new VNPayCallBackResponse(vnPayCallBackResponseCode.getCode(), vnPayCallBackResponseCode.getMessage());
-        response.setAmount(item.getAmount().toString());
+    /**
+     * Tạo đối tượng VNPayCallBackResponse từ VNPayCallBackResponseCode và
+     * VNPayCallBackRequest.
+     */
+    public static VNPayCallBackResponse from(VNPayCallBackResponseCode vnPayCallBackResponseCode,
+            VNPayCallBackRequest item) {
+        // Tạo phản hồi với mã và thông điệp đã cung cấp
+        VNPayCallBackResponse response = new VNPayCallBackResponse(
+                vnPayCallBackResponseCode.getCode(),
+                vnPayCallBackResponseCode.getMessage());
+
+        // Chuyển đổi số tiền sang định dạng đúng (chia cho MULTIPLY_AMOUNT)
+        BigDecimal amount = item.getAmount().divide(BigDecimal.valueOf(VNPayConstants.MULTIPLY_AMOUNT));
+
+        // Gán các trường vào đối tượng phản hồi
+        response.setAmount(amount.toString());
         response.setBankCode(item.getBankCode());
         response.setCardType(item.getCardType());
         response.setTransactionId(item.getTxnRef());
         response.setTransactionInfo(item.getTransactionInfo());
         response.setTransactionNo(item.getPartnerTransNo());
-        response.setTransactionDate(item.getTransactionDate());
-        response.setAmount(item.getAmount().divide(BigDecimal.valueOf(VNPayConstants.MULTIPLY_AMOUNT)).toString());
-        response.setTransactionDate(DateTimeUtil.stringToLocalDateTime(item.getTransactionDate(), VNPayConstants.FORMAT_DATE).toString().replace("T"," "));
+
+        // Chuyển đổi ngày giao dịch và gán vào
+        String formattedDate = DateTimeUtil.stringToLocalDateTime(item.getTransactionDate(), VNPayConstants.FORMAT_DATE)
+                .toString().replace("T", " ");
+        response.setTransactionDate(formattedDate);
+
         return response;
+    }
+
+    /**
+     * Ánh xạ kết quả từ CallBackResponse sang VNPayCallBackResponseCode.
+     */
+    private static VNPayCallBackResponseCode mapToResponseCode(CallBackResponse callBackResponse) {
+        // Truy cập đến enum Result từ CallBackResponse
+        CallBackResponse.Result result = callBackResponse.getResult();
+
+        switch (result) {
+            case SUCCESS:
+                return VNPayCallBackResponseCode.SUCCESS;
+            case INVALID_AMOUNT:
+                return VNPayCallBackResponseCode.INVALID_AMOUNT;
+            case INVALID_TRANSACTION:
+                return VNPayCallBackResponseCode.INVALID_TRANSACTION;
+            case ERROR_SYSTEM:
+                return VNPayCallBackResponseCode.ERROR_SYSTEM;
+            case REQUEST_PROCESSED:
+                return VNPayCallBackResponseCode.REQUEST_PROCESSED;
+            case CANCEL_TRANSACTION:
+                return VNPayCallBackResponseCode.CANCEL_TRANSACTION;
+            default:
+                return VNPayCallBackResponseCode.ERROR_SYSTEM; // Default case
+        }
     }
 }
