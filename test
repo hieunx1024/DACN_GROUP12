@@ -1,0 +1,68 @@
+#include <iostream>
+using namespace std;
+
+typedef long long ll;
+
+// ------------------ Hàm hỗ trợ ------------------
+
+// Hàm tính lũy thừa modulo: (base^exp) % mod
+ll mod_exp(ll base, ll exp, ll mod) {
+    ll result = 1;
+    base %= mod;
+    while (exp > 0) {
+        if (exp & 1)
+            result = (result * base) % mod;
+        base = (base * base) % mod;
+        exp >>= 1;
+    }
+    return result;
+}
+
+// ------------------ Hàm chính xác minh ------------------
+
+// Hàm xác minh chữ ký ElGamal
+bool verifyElGamalSignature(ll p, ll g, ll y, ll r, ll s, ll Hm) {
+    // Kiểm tra điều kiện chữ ký nằm trong khoảng hợp lệ
+    if (r <= 0 || r >= p || s <= 0 || s >= p - 1) {
+        cout << "Chữ ký không hợp lệ về mặt phạm vi!" << endl;
+        return false;
+    }
+
+    // Tính v1 = y^r * r^s mod p
+    ll v1 = (mod_exp(y, r, p) * mod_exp(r, s, p)) % p;
+
+    // Tính v2 = g^H(m) mod p
+    ll v2 = mod_exp(g, Hm, p);
+
+    cout << "Giá trị v1 = " << v1 << endl;
+    cout << "Giá trị v2 = " << v2 << endl;
+
+    return v1 == v2;
+}
+
+// ------------------ Hàm main để kiểm thử ------------------
+
+int main() {
+    // Khóa công khai
+    ll p = 467;       // số nguyên tố lớn
+    ll g = 2;         // phần tử sinh
+    ll y = 329;       // y = g^x mod p
+
+    // Thông tin chữ ký
+    ll r = 228;
+    ll s = 52;
+
+    // Giả sử giá trị hash của thông điệp là:
+    ll Hm = 123;
+
+    // Gọi hàm xác minh
+    bool isValid = verifyElGamalSignature(p, g, y, r, s, Hm);
+
+    // In kết quả
+    if (isValid)
+        cout << "=> Chữ ký HỢP LỆ." << endl;
+    else
+        cout << "=> Chữ ký KHÔNG hợp lệ." << endl;
+
+    return 0;
+}
